@@ -74,8 +74,7 @@ static void get_ram_usage(struct ubus_request *req, int type, struct blob_attr *
 	}else{
         blobmsg_parse(memory_policy, __MEMORY_MAX, memory,blobmsg_data(tb[MEMORY_DATA]), blobmsg_data_len(tb[MEMORY_DATA]));
         ram->free_ram=blobmsg_get_u64(memory[FREE_MEMORY]);
-    }
-	
+    }	
 }
 
 /* Usage text */
@@ -203,10 +202,8 @@ int main(int argc, char *argv[])
 	}
 
     while(!interrupt) {	
-        
-		if (ubus_lookup_id(ctx, "system", &id) || ubus_invoke(ctx, id, "info", NULL, get_ram_usage, ram, 3000)) {
-            
-			syslog(LOG_WARNING, "cannot request memory info from procd");
+        if (ubus_lookup_id(ctx, "system", &id) || ubus_invoke(ctx, id, "info", NULL, get_ram_usage, ram, 3000)) {
+            syslog(LOG_WARNING, "cannot request memory info from procd");
             rc = -1;
 		} else {
             rc = format_data(ram->free_ram, &data);
