@@ -62,7 +62,7 @@ int format_data (long long int ram, char **data)
     return rc;
 }
 
-static void getramusage(struct ubus_request *req, int type, struct blob_attr *msg) 
+static void get_ram_usage(struct ubus_request *req, int type, struct blob_attr *msg) 
 {    
     struct Ramdata *ram = (struct Ramdata *)req->priv;
 	struct blob_attr *tb[__INFO_MAX];
@@ -126,7 +126,7 @@ struct Data getopts(int argc, char** argv)
     return Connection_data;
 }
 
-void MQTTTraceCallback (int level, char * message)
+void MQTT_Trace_Callback (int level, char * message)
 {
      if (level > 0)
      	syslog(LOG_INFO, "%s", message? message:"NULL");
@@ -143,7 +143,7 @@ static int init_device_connection (struct Data Connection_data,IoTPConfig **conf
     syslog(LOG_INFO, "IBM Watson configuration successfully initialized");
 
     /* Set MQTT Trace handler */
-    rc = IoTPDevice_setMQTTLogHandler(*device, &MQTTTraceCallback);
+    rc = IoTPDevice_setMQTTLogHandler(*device, &MQTT_Trace_Callback);
     if ( rc != 0 ) {
     	syslog(LOG_WARNING, "Failed to set MQTT Trace handler");
     }
@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
 
     while(!interrupt) {	
         
-		if (ubus_lookup_id(ctx, "system", &id) || ubus_invoke(ctx, id, "info", NULL, getramusage, ram, 3000)) {
+		if (ubus_lookup_id(ctx, "system", &id) || ubus_invoke(ctx, id, "info", NULL, get_ram_usage, ram, 3000)) {
             
 			syslog(LOG_WARNING, "cannot request memory info from procd");
             rc = -1;
@@ -221,7 +221,6 @@ int main(int argc, char *argv[])
         sleep(10);
         }
     }
-
 
 cleanUp:
     /* Disconnect device */
